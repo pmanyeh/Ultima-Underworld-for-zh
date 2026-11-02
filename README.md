@@ -1,90 +1,67 @@
-# Underworld Exhumed
+# 地下創世紀 繁體中文版（Ultima Underworld 1＋2 zh-TW）
 
-**Ultima Underworld:** [![UW1 accuracy](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw1-accuracy.yml/badge.svg?branch=main)](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw1-accuracy.yml) [![UW1 port](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw1-port.yml/badge.svg?branch=main)](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw1-port.yml) [![UW1 release](https://img.shields.io/github/v/release/abedegno/underworld-exhumed?filter=uw1-*&include_prereleases&label=release)](https://github.com/abedegno/underworld-exhumed/releases)  
-**Ultima Underworld II:** [![UW2 accuracy](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw2-accuracy.yml/badge.svg?branch=main)](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw2-accuracy.yml) [![UW2 port](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw2-port.yml/badge.svg?branch=main)](https://github.com/abedegno/underworld-exhumed/actions/workflows/uw2-port.yml) [![UW2 release](https://img.shields.io/github/v/release/abedegno/underworld-exhumed?filter=!uw1-*&label=release)](https://github.com/abedegno/underworld-exhumed/releases)  
-[![repocheck](https://github.com/abedegno/underworld-exhumed/actions/workflows/repocheck.yml/badge.svg?branch=main)](https://github.com/abedegno/underworld-exhumed/actions/workflows/repocheck.yml) [![Licence: MIT](https://img.shields.io/github/license/abedegno/underworld-exhumed)](LICENSE)
+《**Ultima Underworld: The Stygian Abyss**（地下創世紀：冥河深淵）》與《**Ultima Underworld II: Labyrinth of Worlds**（地下創世紀 II：萬界迷宮）》的**繁體中文化專案**。
+以原版 DOS 遊戲還原的原始碼為基礎，做成能直接在 Windows、macOS 上執行的原生版本，**不需要 DOSBox**。
 
-*Ultima Underworld: The Stygian Abyss* (1992) and *Ultima Underworld II: Labyrinth of Worlds* (1993), dug out of their original DOS programs. For each game there is:
+![啟動頁：選擇要玩的遊戲](docs/release/zh-v1.0/launcher.png)
 
-- **Source code that rebuilds the original program byte for byte.** It compiles with the original Borland tools to exactly the shipped `UW.EXE` and `UW2.EXE`, with readable names, shared headers and notes on what each file does in the game.
-- **A native port** for macOS, Windows and Linux, built from that same source. It plays the game in a window with its music, speech and effects, and is checked against recorded DOS sessions for every change.
-- **A web build** of the same port, compiled to WebAssembly: **[play both games in your browser](https://abedegno.github.io/underworld-exhumed-web/)**, with nothing to install.
+> **需要你自己擁有的 GOG 版 Ultima Underworld 1＋2。**
+> 本專案不含任何原版遊戲檔案，也不含遊戲的英文原文；發佈包只放中文譯文與程式。
 
-*Arrived from a UW2Decomp or UW1Decomp link?* Those repositories are now [`uw2/`](uw2/README.md) and [`uw1/`](uw1/README.md) here, with their full history; an old link to a shared page (this README, `docs/BUILDING.md`) lands on the page for both games, which links to each game's own.
+## 特色
 
-This repository holds no game data: the native ports need your own copy of each game (the GOG releases). The web page is a separate site, with its own copy. This is a fan research project, not affiliated with or endorsed by the rights holders; see [Licence and legal notice](#licence-and-legal-notice).
+- **兩款遊戲、同一個入口**：啟動頁選擇 UW1 或 UW2，自動尋找 GOG 安裝位置。
+- **全面中文化**：對話、書本、卷軸、物品與戰鬥訊息、介面文字都是繁體中文，採高解析中文字型（粉圓體）。
+- **對照攻略不吃力**：人名、地名第一次出現時加註英文原名；需要打字詢問的話題，打中文或英文都可以。
+- **中文地圖註記**：在地圖上點一下就能用中文寫註記。
+- **原汁原味為預設**：現代按鍵（WASD）、滑鼠視角、血瓶／法力瓶數值、傷害數字、全地圖、無敵等選用功能**全部預設關閉**，想用再到設定畫面（Windows **F11**、Mac **Cmd+,**）打開。
+- 支援 Roland MT-32 音樂（需自備 ROM，見包內 `說明_MT-32音樂.txt`）。
 
-## Play
-
-| | |
+| 對話 | 遊戲畫面 |
 | --- | --- |
-| ![Ultima Underworld: a dungeon corridor](docs/img/uw1-dungeon.png) | ![Ultima Underworld: talking to Bragit](docs/img/uw1-bragit.png) |
-| ![Ultima Underworld II: Lord British's castle](docs/img/uw2-castle.png) | ![Ultima Underworld II: Lord British's greeting](docs/img/uw2-lord-british.png) |
+| ![對話](docs/release/zh-v1.0/dialogue.png) | ![遊戲畫面](docs/release/zh-v1.0/game.png) |
+| ![地圖](docs/release/zh-v1.0/map.png) | ![設定畫面](docs/release/zh-v1.0/settings.png) |
 
-*Screens from the recorded DOS sessions the ports are tested against: the ports draw exactly the same.*
+## 下載與遊玩
 
+1. 到 [Releases](https://github.com/pmanyeh/Ultima-Underworld-for-zh/releases) 下載 `Underworld-zhTW-…-Windows.zip` 或 `…-macOS.zip`。
+2. 完整解壓縮。Windows 雙擊 `Underworld.exe`；Mac 雙擊 `開始遊戲.command`。
+   - Windows 出現「Windows 已保護您的電腦」：按「其他資訊」→「仍要執行」。
+   - Mac 若擋下程式：「系統設定」→「隱私權與安全性」→「仍要打開」。
+3. 在啟動頁選擇遊戲。找不到 GOG 安裝位置時，會請你選擇遊戲資料夾。
 
-1. **Download** the package for your system from [Releases](https://github.com/abedegno/underworld-exhumed/releases). Each release is for one game: `uw1-v…` releases are *Ultima Underworld*, `uw2-v…` releases are *Ultima Underworld II*.
-2. **Install the game from GOG.** The port finds it in GOG's usual folders, including inside GOG's Mac app and its `game.gog` CD image, and on Windows where GOG's installer recorded it. If it finds nothing, it asks you to choose the folder, and remembers it. From a command line, `--data /path/to/game` names it.
-3. **Start it:**
-   - macOS: `UW1.app` or `UW2.app`. Both are signed and notarised, so they open like any app.
-   - Windows: `uw1port.exe` or `uw2port.exe`.
-   - Linux: the AppImage (`chmod +x`, then run it), or `./uw1` or `./uw2` from the tarball. The Linux packages need glibc 2.35 or later (Ubuntu 22.04 or newer).
+操作按鍵請看遊戲內設定畫面的「按鍵說明」頁籤，它會列出你目前設定下實際可用的按鍵。
 
-The controls are the game's own: the mouse, and the keys in the game's manual. F11 (Cmd+, on macOS) opens the port's settings screen ([SETTINGS.md](docs/SETTINGS.md)). The game's cursor follows the system pointer; `--mouse lock` captures the pointer on a click instead, as DOSBox does, with Ctrl+F10 to release it. With the `mouse-look` enhancement on, the `` ` `` key turns the view by the mouse instead ([ENHANCEMENTS.md](docs/ENHANCEMENTS.md)). With `modern-keys`, the keys are UltimaHacks' layout (WASD, Space to attack, Q and E to look and use).
+## 專案內容
 
-Saved games and settings are kept in the port's home folder, never in the game folder: `~/.uw1port` or `~/.uw2port` on macOS and Linux, `%APPDATA%\uw1port` or `%APPDATA%\uw2port` on Windows.
-
-The first run gets a Sound Blaster with FM music and digitised speech or effects. For Roland MT-32 music you need your own MT-32 or CM-32L ROM images. The port finds them by itself in a `roms` folder in its home folder, beside the game or the program, or where DOSBox keeps MT-32 ROMs; or give `--mt32-roms` a folder or one of the files. Any file names work, whole images or their halves: the ROMs are recognised by their contents. On a Mac, drop the ROM folder onto the app. `--sound` picks other cards, and `--help` lists every option. Each game's README has its sound card numbers: [uw1](uw1/README.md), [uw2](uw2/README.md).
-
-**If something goes wrong,** [open an issue](https://github.com/abedegno/underworld-exhumed/issues/new/choose). Each play session's inputs are recorded to `recordings/` in the home folder (the newest five are kept). Zip the newest folder with the log beside it and attach it: it replays your session here exactly.
-
-Optional enhancements, all off by default, are listed in [docs/ENHANCEMENTS.md](docs/ENHANCEMENTS.md).
-
-### In a browser
-
-**[https://abedegno.github.io/underworld-exhumed-web/](https://abedegno.github.io/underworld-exhumed-web/)** plays both games in a desktop browser, with MT-32 music. Choose a game; the page reloads itself once on a first visit to turn on the threads the port needs. The settings screen opens with the gear at the page's corner (or F11), the button beside it goes full screen, and with the mouse locked Esc frees the pointer. Saved games and settings are kept in the browser's storage, which is not as safe as a desktop's saves. [docs/WEB.md](docs/WEB.md) has the details and how the page is built and checked.
-
-## Study and modify
-
-Both games are byte-matching decompilations, made and checked with [Exhume](https://github.com/abedegno/Exhume), the toolkit both were built with. It is included here as a submodule.
-
-```sh
-git clone --recursive https://github.com/abedegno/underworld-exhumed.git
-cd underworld-exhumed
-make setup        # Exhume and its tools, then each game's setup
-make port         # both ports, no Borland toolchain or game data needed
-make check        # each game's gate: every source rebuilds its part of the EXE exactly
-make test         # the gate, the ports, routine fuzzing and every recorded session against DOS
-```
-
-`GAME=uw1` or `GAME=uw2` runs a target for one game. [docs/BUILDING.md](docs/BUILDING.md) has the requirements, the private CI bundles and releases.
-
-What there is to read:
-
-| | |
+| 路徑 | 說明 |
 | --- | --- |
-| [docs/behaviour/](docs/behaviour/README.md) | what the games do, as rules with exact numbers, for game programmers and modders who don't read the C: NPC AI, schedules, combat, magic, conversations, player upkeep, traps and triggers |
-| [docs/FORMATS.md](docs/FORMATS.md) | every data file both games read and write, from the code that reads it |
-| [docs/UW1-UW2-DIFFERENCES.md](docs/UW1-UW2-DIFFERENCES.md) | where the two games' rules differ, routine by routine |
-| [docs/PORT.md](docs/PORT.md) | how the ports work and how they are proved against DOS |
-| [docs/WEB.md](docs/WEB.md) | the web build: building it, checking it and deploying the page |
-| [uw1/docs/FINDINGS.md](uw1/docs/FINDINGS.md), [uw2/docs/FINDINGS.md](uw2/docs/FINDINGS.md) | what matching revealed: likely bugs in the originals, game rules, engine details |
-| `uw1/vectors/`, `uw2/vectors/` | input and output tables for game rules, made by running the original programs' code |
-| `uw1/map/crosswalk.tsv`, `uw2/map/crosswalk.tsv` | every function by the IDA listing's name and address, with its matched source (`tools/crosswalk.py --find`) |
+| [`uw1/`](uw1/README.md)、[`uw2/`](uw2/README.md) | 兩款遊戲的還原原始碼與原生移植 |
+| `uw1/i18n/`、`uw2/i18n/` | 中文化資料：詞表、用詞決策、工具與驗證器（譯文以雜湊 catalog 發佈，不含英文原文） |
+| [`uw1/docs/i18n/`](uw1/docs/i18n/)、[`uw2/docs/i18n/`](uw2/docs/i18n/) | 各階段的設計、報告與驗證紀錄 |
+| [`launcher/`](launcher/) | 雙遊戲啟動頁與 Windows／macOS 打包工具 |
+| `exhume/` | 共用執行環境（子模組，[Exhume-for-zh](https://github.com/pmanyeh/Exhume-for-zh)），含 UTF-8、CJK 排版、字型與 HD 文字繪製 |
+| [`UPSTREAM_README.md`](UPSTREAM_README.md) | 上游專案原版說明（建置、除錯、移植細節） |
 
-Each game folder (`uw1/`, `uw2/`) is self-contained: its sources, maps, tests and tools, its own `make`, and its own README with the details. [CONTRIBUTING.md](CONTRIBUTING.md) says how a change is proved.
+自行建置請參考 [docs/BUILDING.md](docs/BUILDING.md) 與各遊戲目錄內的說明。
 
-## Status
+## 回報問題與譯文意見
 
-| | *Ultima Underworld* (`uw1/`) | *Ultima Underworld II* (`uw2/`) |
-| --- | --- | --- |
-| Code matched | every code segment: 89 C files and 50 assembly modules | every code segment: 99 C files and the assembly |
-| Exact link | identical to `UW.EXE` | identical to `UW2.EXE` |
-| Port | eleven recorded sessions identical to DOS on macOS, Linux and Windows, and the web build's under Node.js | twelve recorded sessions identical to DOS on macOS, Linux and Windows, and the web build's under Node.js |
-| Releases | 1.0.1, published | 1.2.2, published |
-| In a browser | [the web page](https://abedegno.github.io/underworld-exhumed-web/) | [the web page](https://abedegno.github.io/underworld-exhumed-web/) |
+遊戲很長，我們還沒有把每條路線都玩過。遇到問題或譯文不順，請到 [Issues](https://github.com/pmanyeh/Ultima-Underworld-for-zh/issues) 回報，並附上：
 
-## Licence and legal notice
+- UW1 或 UW2、發生了什麼事、怎麼操作的；
+- 截圖（翻譯問題請引用那句話）；
+- 遊戲資料夾 `recordings` 內最新一份錄影（可原樣重現你的操作）。
 
-The project's own work (the tools, the documentation, and the comments, names and structure added to the decompiled code) is under the MIT licence ([LICENSE](LICENSE)). The decompiled code is derived from the games' programs, whose copyright belongs to their owners; the licence grants no right in it. [NOTICE](NOTICE) has the details, and each game's NOTICE and THIRD-PARTY-NOTICES the rest.
+## 致謝
+
+- **[Underworld Exhumed](https://github.com/abedegno/underworld-exhumed)**（abedegno）：原版程式的位元組級還原與原生移植，本專案建立在它之上，並持續與上游同步。
+- **UltimaHacks**（John Glassmyer）與 **uwpatch**（SiENcE）：部分強化功能的參考。
+- **粉圓體 jf-openhuninn**：遊戲使用的中文字型（SIL OFL 授權，授權文字附於發佈包 `licenses/`）。
+- 所有提供譯文、試玩與回報的朋友。
+
+## 授權與聲明
+
+本專案為粉絲研究計畫，與 Electronic Arts、Origin Systems、Blue Sky Productions、Looking Glass Technologies 無任何隸屬或背書關係。
+Ultima 與 Ultima Underworld 為 Electronic Arts 的商標，遊戲著作權屬其所有人。
+程式碼依 [MIT 授權](LICENSE)，該授權不授予原版遊戲的任何權利。詳見 [NOTICE](NOTICE)、`uw1/NOTICE`、`uw2/NOTICE`。
