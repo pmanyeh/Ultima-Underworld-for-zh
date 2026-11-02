@@ -58,7 +58,8 @@
 - **[Underworld Exhumed](https://github.com/abedegno/underworld-exhumed)**（abedegno）：原版程式的位元組級還原與原生移植，本專案建立在它之上，並持續與上游同步。
 - **UltimaHacks**（John Glassmyer）與 **uwpatch**（SiENcE）：部分強化功能的參考。
 - **粉圓體 jf-openhuninn**：遊戲使用的中文字型（SIL OFL 授權，授權文字附於發佈包 `licenses/`）。
-- 所有提供譯文、試玩與回報的朋友。
+- **范剛維**：測試 Mac 版，並提供 UW2 文本翻譯。
+- 所有試玩與回報的朋友。
 
 ## 授權與聲明
 
