@@ -8,7 +8,7 @@ on:
   # a push to the Chinese branch that touches the release builds it too (workflow_dispatch runs
   # only a workflow on the default branch), at the input's default version
   push:
-    branches: ["feature/zh-tw-native"]
+    branches: ["main"]
     paths: ["launcher/**", ".github/workflows/zh-release-macos.yml"]
   workflow_dispatch:
     inputs:

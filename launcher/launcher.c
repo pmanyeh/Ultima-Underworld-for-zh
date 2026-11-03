@@ -33,7 +33,7 @@
 #ifndef LAUNCHER_VERSION
 #define LAUNCHER_VERSION "dev"
 #endif
-#define ISSUES_URL "https://github.com/pmanyeh/underworld-exhumed/issues"
+#define ISSUES_URL "https://github.com/pmanyeh/Ultima-Underworld-for-zh/issues"
 #define FONT_FILE "fonts/jf-openhuninn-2.1.ttf"
 
 enum { CANVAS_W = 1440, CANVAS_H = 860 };
