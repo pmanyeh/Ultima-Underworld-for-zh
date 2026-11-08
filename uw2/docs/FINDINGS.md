@@ -332,6 +332,15 @@ The others are not reached by any of the eight recorded sessions, which cover th
 - **ACLZW's work area running past `stdat`**: not a bug in itself. `ac_setup_lzw` uses FFFFh bytes from `stdat`, through `ATM_Strings` and into `cmpbuf1_start` and `cmpbuf2_start` (the image decoders' scratch, [3d/EXPAND.ASM](../src/3d/EXPAND.ASM)), which follow it in the same order in both builds. Archive I/O and image decoding do not run at the same time. The only harm found is to the notes, above.
 - **`do_fetchmap`'s `tmcolor`** stays in the list above, but with no effect, since nothing reads the value.
 
+### Pushing a mobile object can hang the game or leave curP on a dead frame
+
+- **What happens:** when a moving object pushes another (`do_objhit`, then `bounce_obj`), the pushed object's tile is worked out from the collision's offset (`objhit_tilex`, `objhit_tiley`), which can name the tile next to a mobile object's own. `set_phys_data` then fails to take it off that tile (`Obj_Rem` finds nothing) and adds it to the new one: the object is on two tile lists and a list loops for ever, so the next walk of it (`check_pplate`) never ends. Separately, what `do_objhit` does to the touched object (using it, pushing it, which can settle it with `obj_deal`) can leave `curP` on a callee's local `MotionCalc`, gone once that returns, while the mover's collision checks in `MOTION.C` go on reading `curP`.
+- **Where:** [motion/OBJPHYS.C](../src/motion/OBJPHYS.C), `do_objhit` and `bounce_obj`.
+- **Evidence:** a player's black-box recording (2026-11-08, with `--enhance free-cast`): a magic satellite circling the player in the castle pushed a pile of debris (item 0xD6, mobile object 247, home tile 20,42, worked out as 20,43); the port then hung in `check_pplate`. With the tile corrected, the replay faulted in `ObjectCheck` on a `curP` holding garbage (index -2048), a fault whose place moved with the build's stack layout.
+- **Confidence:** certain for the port; DOS was not run on this recording (it carries port enhancements), so whether DOS hangs in the same place is inferred from the code, which is the same.
+- **Effect:** the game freezes, and has to be closed.
+- **For a port:** the port (not the DOS build) uses a mobile pushed object's own tile, and puts `curP` back for the mover after `do_objhit`. Both change nothing where the original's values were right; the regression sessions match DOS as before.
+
 ## 2. Game rules recovered from the code
 
 Each rule links to the note that has the detail and the function names.

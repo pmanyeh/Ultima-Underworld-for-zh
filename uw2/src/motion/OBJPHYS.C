@@ -65,6 +65,18 @@ int far bounce_obj(struct Object far *obj, struct Object far *other)
     if (other != 0) {
         XP = objhit_tilex;
         YP = objhit_tiley;
+#ifndef __TURBOC__
+        /* port only, two faults of the original on this path, seen with a magic satellite pushing
+           a pile of debris. do_objhit works the struck object's tile out from the collision's
+           offset, which can name the tile next to a mobile object's own: set_phys_data then fails
+           to take it off that tile and adds it to another, on two lists, and a tile's list loops
+           for ever (the game hangs in check_pplate). A mobile object keeps its tile: that one is
+           used. The second is put right in do_objhit, below. */
+        if (other < (struct Object far *)objdata) {
+            XP = OBJ_HOMEX(other);
+            YP = OBJ_HOMEY(other);
+        }
+#endif
         get_phys_data(other, pp);
         if (pp->mass != 0) {
             /* 16-bit ints, as Turbo C's (shl ax,6, and imul, each then cwd before the idiv):
@@ -76,8 +88,16 @@ int far bounce_obj(struct Object far *obj, struct Object far *other)
             pp->heading = CP->heading;
             pp->speed = 0xEB;
             pp->vel[2] = (int16)(CP->vel[2] * scale) / 0x40;
-            XP = objhit_tilex;
-            YP = objhit_tiley;
+#ifndef __TURBOC__
+            if (other < (struct Object far *)objdata) {
+                XP = OBJ_HOMEX(other);
+                YP = OBJ_HOMEY(other);
+            } else
+#endif
+            {
+                XP = objhit_tilex;
+                YP = objhit_tiley;
+            }
             set_phys_data(other, pp);
         } else if (pp->speed != 0)
             pp->speed = 0;
@@ -135,7 +155,23 @@ void far missile_newhit(struct Object far *proj, struct Object far *hit)
    bounce (bounce_obj), 0x10 if using destroyed the mover (MapObj_X < 0), or a trigger's
    result. Two mobile non-creatures hitting mark each other (b15 bit 7) and do not hit
    again, except fireballs and the resilient sphere. */
+#ifndef __TURBOC__
+/* port only: the second fault. What do_objhit does to the object touched (using it, pushing it,
+   which can settle it with obj_deal) can leave curP on a callee's local MotionCalc, gone once it
+   returns, while the mover's collision checks (MOTION.C) go on reading curP. DOS reads the dead
+   frame; the port's stack differs and faults. curP is put back for the mover. */
+static int do_objhit_game(int ci, int index);
 int far do_objhit(int ci, int index)
+{
+    struct MotionCalc near *mover = curP;
+    int r = do_objhit_game(ci, index);
+    curP = mover;
+    return r;
+}
+static int do_objhit_game(int ci, int index)
+#else
+int far do_objhit(int ci, int index)
+#endif
 {
     int item;
     struct Object far *obj;

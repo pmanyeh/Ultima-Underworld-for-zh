@@ -720,6 +720,29 @@ void far gronk_whoami(int whoami, unsigned char all, NEARPTR arg,
     }
 }
 
+#ifndef __TURBOC__
+/* port only: the tables below call every handler as SpellFn, fn(x, y, target, tile, src), and
+   cast sp_true_sight and sp_study_monster to it, though they take (caster, target). On DOS's stack that worked: the
+   two ints made the caster's far pointer, which they do not use, and target came next.
+   On the host the arguments go in registers, so target would be y, a tile coordinate, and the
+   first read through it faults. These adapters pass target where it is expected. */
+static char far sp_true_sight_at(int x, int y, struct Object far *target, struct Tile far *tile, unsigned char src)
+{
+    (void)x; (void)y; (void)tile; (void)src;
+    return sp_true_sight(0, target);
+}
+static char far sp_study_monster_at(int x, int y, struct Object far *target, struct Tile far *tile, unsigned char src)
+{
+    (void)x; (void)y; (void)tile; (void)src;
+    return sp_study_monster(0, target);
+}
+#define TRUE_SIGHT sp_true_sight_at
+#define STUDY_MONSTER sp_study_monster_at
+#else
+#define TRUE_SIGHT (SpellFn)sp_true_sight
+#define STUDY_MONSTER (SpellFn)sp_study_monster
+#endif
+
 HOST_LAYOUT_BEGIN
 struct AreaSpell {
     SpellFn fn;
@@ -730,7 +753,7 @@ struct AreaSpell {
 HOST_LAYOUT_END
 
 struct AreaSpell area_spells[8] = {
-    { (SpellFn)sp_true_sight, 100, 1, 2 },
+    { TRUE_SIGHT, 100, 1, 2 },
     { sp_sheet_light, 6, 4, 2 },
     { sp_confusion, 12, 4, 2 },
     { sp_meteor, 10, 4, 2 },
@@ -741,7 +764,7 @@ struct AreaSpell area_spells[8] = {
 
 SpellFn area1_spells[8] = {
     sp_bleed, sp_fear, sp_ward_undead, (SpellFn)sp_charm, sp_poison, sp_hold, sp_smite,
-    (SpellFn)sp_study_monster
+    STUDY_MONSTER
 };
 
 /* Area spells (class 6): area_spells[minor - 1] gives the per-square handler, how many

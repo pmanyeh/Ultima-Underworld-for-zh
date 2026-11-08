@@ -535,8 +535,24 @@ void far gronk_whoami(int whoami, char all, NEARPTR arg,
 
 /* The per-square handlers of the area spells (class 6, minors 1..4) and of the spells on
    a critter in front of the player (class 7, minors 1..5). */
+#ifndef __TURBOC__
+/* port only: the tables below call every handler as SpellFn, fn(x, y, target, tile, src), and
+   cast sp_true_sight to it, though it takes (caster, target). On DOS's stack that worked: the
+   two ints made the caster's far pointer, which it does not use, and target came next.
+   On the host the arguments go in registers, so target would be y, a tile coordinate, and the
+   first read through it faults. These adapters pass target where it is expected. */
+static char far sp_true_sight_at(int x, int y, struct Object far *target, struct Tile far *tile, unsigned char src)
+{
+    (void)x; (void)y; (void)tile; (void)src;
+    return sp_true_sight(0, target);
+}
+#define TRUE_SIGHT sp_true_sight_at
+#else
+#define TRUE_SIGHT (SpellFn)sp_true_sight
+#endif
+
 SpellFn area_spells[4] = {
-    (SpellFn)sp_true_sight, sp_sheet_light, sp_confusion, sp_meteor
+    TRUE_SIGHT, sp_sheet_light, sp_confusion, sp_meteor
 };
 
 SpellFn area1_spells[5] = {
