@@ -10,6 +10,10 @@ static const struct { const char *key, *zh; } phrases[] = {
     {"cheat.rescued", "已返回安全位置。\n"},
     {"cheat.applied", "密技設定已生效。\n"},
     {"enhance.applied", "設定已生效。\n"},
+    {"spellbook.missing", "缺少符文："},           /* --enhance spellbook (port/ui/spellbook.c) */
+    {"spellbook.about", "法術書：列出各環法術，點選後把符文放上符石欄。\n"},
+    {"spellbook.unlisted", "手冊未列"},
+    {"spellbook.armageddon", "危險：這個法術會摧毀身上所有物品與該層所有物件，並清空符石袋。\n"},
     {"cheat.remembered", "已記住這一層的安全位置。\n"},
     {"cheat.not_safe", "請先站在乾燥、沒有障礙的地面上。\n"},
     {"map.note_prompt", "地圖註記（Enter 完成，Esc 取消）"},

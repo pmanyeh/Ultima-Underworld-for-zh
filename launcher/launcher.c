@@ -56,7 +56,7 @@ typedef struct Game {
 static Game games[2] = {
     { .exe = "uw1port", .home = "UW1", .cfg = "uw1port.cfg", .name = "地下創世紀：冥河深淵",
       .subtitle = "Ultima Underworld: The Stygian Abyss" },
-    { .exe = "uw2port", .home = "UW2", .cfg = "uw2port.cfg", .name = "地下創世紀 II：萬界迷宮",
+    { .exe = "uw2port", .home = "UW2", .cfg = "uw2port.cfg", .name = "地下創世紀 II：次元之旅",
       .subtitle = "Ultima Underworld II: Labyrinth of Worlds" },
 };
 static const char *const button_text[BUTTONS] = { "說明", "回報問題", "結束" };

@@ -10,6 +10,7 @@
 #include "event.h"
 #include "file.h"
 #include "ui.h"
+#include "gfx.h"
 #include "sys.h"
 #include "inv.h"
 #include "portgame.h"
@@ -171,7 +172,7 @@ static const char *toggle(int argc, char **argv, int run, int bit)
 /* The enhancements the settings screen turns on and off in play, not at the next start: each read
    where it acts, with nothing set up from it when the run starts */
 static const int live[] = { ENH_INVERT_LOOK, ENH_SPLIT_ALL, ENH_UNKNOWN_TOPIC, ENH_FLASK_NUMBERS, ENH_AUTO_KEY, ENH_E_TAKES, ENH_EASY_ERASE,
-                            ENH_DAMAGE_NUMBERS, ENH_ENEMY_HEALTH };
+                            ENH_DAMAGE_NUMBERS, ENH_ENEMY_HEALTH, ENH_SPELLBOOK, ENH_SPELLBOOK_ALL };
 #define LIVE ((int)(sizeof live / sizeof live[0]))
 static const char *enhance(int argc, char **argv, int run)
 {
@@ -182,6 +183,7 @@ static const char *enhance(int argc, char **argv, int run)
     if (run) {
         if (v) enhance_on |= 1u << bit; else enhance_on &= ~(1u << bit);
         if (bit == ENH_FLASK_NUMBERS && !v) flask_text_clear();
+        if (bit == ENH_SPELLBOOK) pretty_panelagain();     /* the rune panel's icon comes or goes */
         say("enhance.applied", "Setting applied.\n");
     }
     return NULL;
@@ -197,6 +199,7 @@ static const char *brightness(int n, char **a, int run)
     if (run) port_bright_strength_set((int)value);
     return NULL;
 }
+static const char *free_cast(int n, char **a, int run) { return toggle(n, a, run, ENH_FREE_CAST); }
 static const char *rescue(int n, char **a, int run)
 {
     (void)a;
@@ -217,9 +220,15 @@ static const char *remember(int n, char **a, int run)
     return NULL;
 }
 
+static const char *all_runes(int n, char **a, int run)
+{
+    const char *e = toggle(n, a, run, ENH_ALL_RUNES);
+    if (run && !e) pretty_panelagain();                        /* the rune panel, if it is the one showing */
+    return e;
+}
 static const struct cheat_cmd commands[] = {
     { "menu-god", "0|1", god }, { "menu-map", "0|1", map },
-    { "menu-rescue", "", rescue }, { "menu-anchor", "", remember },
+    { "menu-rescue", "", rescue }, { "menu-anchor", "", remember }, { "menu-runes", "0|1", all_runes }, { "menu-free-cast", "0|1", free_cast },
     { "menu-bright", "0|1", bright }, { "menu-bright-level", "0..15", brightness }, { "menu-no-wear", "0|1", no_wear }, { "menu-enhance", "NAME 0|1", enhance }
 };
 static const struct cheat_game menu = { commands, sizeof commands / sizeof commands[0], ready };
@@ -252,6 +261,8 @@ static void map_request(int on) { request(on ? "menu-map 1" : "menu-map 0"); }
 void port_cheat_rescue_request(int unused) { (void)unused; request("menu-rescue"); }
 void port_cheat_anchor_request(int unused) { (void)unused; request("menu-anchor"); }
 static void no_wear_request(int on) { request(on ? "menu-no-wear 1" : "menu-no-wear 0"); }
+static void all_runes_request(int on) { request(on ? "menu-runes 1" : "menu-runes 0"); }
+static void free_cast_request(int on) { request(on ? "menu-free-cast 1" : "menu-free-cast 0"); }
 static void enhance_request(int bit, int on)
 {
     char command[64];
@@ -268,7 +279,9 @@ static void live5(int on) { enhance_request(live[5], on); }
 static void live6(int on) { enhance_request(live[6], on); }
 static void live7(int on) { enhance_request(live[7], on); }
 static void live8(int on) { enhance_request(live[8], on); }
-static void (*const live_request[LIVE])(int) = { live0, live1, live2, live3, live4, live5, live6, live7, live8 };
+static void live9(int on) { enhance_request(live[9], on); }
+static void live10(int on) { enhance_request(live[10], on); }
+static void (*const live_request[LIVE])(int) = { live0, live1, live2, live3, live4, live5, live6, live7, live8, live9, live10 };
 
 void port_cheat_settings(void)
 {
@@ -277,5 +290,7 @@ void port_cheat_settings(void)
     settings_enhancement(ENH_GOD_MODE, SET_TAB_CHEATS, god_request);
     settings_enhancement(ENH_BRIGHT_VIEW, SET_TAB_CHEATS, bright_request);
     settings_enhancement(ENH_NO_WEAR, SET_TAB_CHEATS, no_wear_request);
+    settings_enhancement(ENH_ALL_RUNES, SET_TAB_CHEATS, all_runes_request);
+    settings_enhancement(ENH_FREE_CAST, SET_TAB_CHEATS, free_cast_request);
     for (i = 0; i < LIVE; i++) settings_enhancement(live[i], SET_TAB_ENHANCE, live_request[i]);
 }

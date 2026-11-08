@@ -66,17 +66,43 @@ void far ShowRune(int rune)
                   ((rune & 3) + 1) * 0x12 + 0xEC, 0xBC - ((rune >> 2) + 1) * 0xF + 2);
 }
 
+#ifndef __TURBOC__
+int port_spellbook_click(int x, int y, int right);   /* port/ui/spellbook.c */
+void port_spellbook_icon(void);
+int port_has_rune(int rune);
+int port_free_cast(void);
+
+/* port only: a spell book's choice on the shelf; the next rune click adds to it, as after clicks */
+void far port_rune_shelf(const unsigned char *runes, int count)
+{
+    int i;
+    memset(player->shelf, RUNE_NONE, 3);
+    for (i = 0; i < count; i++)
+        player->shelf[i] = runes[i];
+    player->nrunes = (char)count;
+    dseg_67d6_6A96 = 0;
+    set_runes(player->shelf);
+}
+#endif
+
 void far RedispRune(void)
 {
     int i;
 
     mouse_hide();
     for (i = 0; i < NUM_RUNES; i++)
+#ifndef __TURBOC__
+        if (port_has_rune(i)) {         /* the bag, or --enhance all-runes */
+#else
         if (player->runebag[i >> 3] >> 7 - (i & 7) & 1) {
+#endif
             Transparency = 1;
             ShowRune(i);
             Transparency = 0;
         }
+#ifndef __TURBOC__
+    port_spellbook_icon();
+#endif
     mouse_show();
 }
 
@@ -98,11 +124,20 @@ void far mous_in_rune(void)
 
     if (GameInputMode != 0)
         return;
+#ifndef __TURBOC__
+    /* port only: --enhance spellbook, the book icon in the strip's corner (port/ui/spellbook.c) */
+    if (inplist->y < 0x12 && port_spellbook_click(inplist->x, inplist->y, inplist->cmd & 2))
+        return;
+#endif
     if (inplist->y < 0x12)
         clear_shelf();
     else {
         rune = 0x14 - ((inplist->y - 0x12) / 0xF << 2) + inplist->x / 0x12;
+#ifndef __TURBOC__
+        if (port_has_rune(rune)) {
+#else
         if (player->runebag[rune >> 3] >> 7 - (rune & 7) & 1) {
+#endif
             if (inplist->cmd & 2) {
                 obj.ol.f.link = 0;
                 SET_ITEM(&obj, rune + FIRST_RUNESTONE);
@@ -229,6 +264,11 @@ char far player_cast(unsigned char idx)
     if (level > 8)
         level = 1;
     cls = (spells[idx].cls & 0xF8) >> 3;
+#ifndef __TURBOC__
+    if (port_free_cast())               /* port only: --enhance free-cast, past the checks below */
+        sub = spells[idx].sub;
+    else {
+#endif
     if ((PlayerLevel - 1) / 8 == 0 && level > 3)
         return fail_spell(3);
     if ((player->level + 1) / 2 < level)
@@ -243,9 +283,18 @@ char far player_cast(unsigned char idx)
         sub = level / 2;
     } else
         sub = spells[idx].sub;
+#ifndef __TURBOC__
+    }
+#endif
     spell_delay = (level * 2 - player->level) * 4 + 0x80;
     lstime = player->game_clock;
     mspell_mused = level * 3;
+#ifndef __TURBOC__
+    if (port_free_cast()) {
+        spell_delay = 0;
+        mspell_mused = 0;
+    }
+#endif
     if (cls != SPELLC_MISSILE && cls != SPELLC_1AREA) {
         player->play_mana -= mspell_mused;
         mspell_mused = 0;

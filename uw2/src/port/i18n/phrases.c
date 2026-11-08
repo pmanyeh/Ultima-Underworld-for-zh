@@ -42,6 +42,10 @@ static const struct { const char *key, *zh; } phrases[] = {
     {"vend.price", "（%d 金幣）"},                    /* WORLDEV.C: a vending machine's price */
     {"cheat.applied", "密技設定已生效。\n"},        /* ui/cheat_menu.c, as UW1's */
     {"enhance.applied", "設定已生效。\n"},
+    {"spellbook.missing", "缺少符文："},           /* --enhance spellbook (port/ui/spellbook.c) */
+    {"spellbook.about", "法術書：列出各環法術，點選後把符文放上符石欄。\n"},
+    {"spellbook.unlisted", "手冊未列"},
+    {"spellbook.armageddon", "危險：這個法術會摧毀身上所有物品與該層所有物件，並清空符石袋。\n"},
     {"cheat.no_safe", "找不到可站立的安全位置，請讀取存檔。\n"},
     {"cheat.rescued", "已返回安全位置。\n"},
     {"cheat.remembered", "已記住這一層的安全位置。\n"},

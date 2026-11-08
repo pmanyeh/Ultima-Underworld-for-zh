@@ -68,7 +68,7 @@ static const struct entry entries[] = {
     { MODERN, 0, "X", "Close the open container", NULL, "關閉開著的容器" },
     { MODERN, 0, "V / B", "Scroll the inventory down / up", "V／B", "背包往下／往上捲" },
     { MODERN, 0, "Z", "Map", NULL, "地圖" },
-    { MODERN, 0, "R / F", "Rune bag / statistics (again: back)", "R／F", "符文袋／屬性面板（再按回背包）" },
+    { MODERN, 0, "R / F", "Rune bag / statistics (again: back)", "R／F", "符石袋／屬性面板（再按回背包）" },
     { MODERN, 0, "G", "Compass", NULL, "指南針" },
     { MODERN, 0, "H", "Health and mana flasks", NULL, "查看血瓶與法力瓶" },
 

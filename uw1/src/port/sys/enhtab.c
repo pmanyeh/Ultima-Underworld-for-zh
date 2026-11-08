@@ -34,4 +34,8 @@ const struct enhance_flag enhance_table[ENH_COUNT] = {
     { "split-all", "Move how many? starts at the whole stack", ENH_GAMEPLAY, NULL, NULL },
     { "unknown-topic", "A word you type that a person does not know gets an answer: theirs, or I don't know what that is...", ENH_GAMEPLAY, NULL, NULL },
     { "easy-erase", "The map's eraser takes a note it is near and stays in hand after a miss; right button or Esc puts it down", ENH_GAMEPLAY, NULL, NULL },
+    { "spellbook", "A book icon on the rune panel lists each circle's spells; a click puts a spell's runes on the shelf if you have them", ENH_GAMEPLAY, NULL, NULL },
+    { "spellbook-all", "The spell book also lists the spells the game's manual leaves out", ENH_GAMEPLAY, NULL, NULL },
+    { "all-runes", "Every rune counts as in the rune bag while this is on; the bag itself and saved games are left as they are", ENH_GAMEPLAY, NULL, NULL },
+    { "free-cast", "Any spell casts whatever your level, mana and skill, and wherever you are; it costs no mana and has no wait", ENH_GAMEPLAY, NULL, NULL },
 };

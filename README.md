@@ -1,6 +1,6 @@
 # 地下創世紀 繁體中文版（Ultima Underworld 1＋2 zh-TW）
 
-《**Ultima Underworld: The Stygian Abyss**（地下創世紀：冥河深淵）》與《**Ultima Underworld II: Labyrinth of Worlds**（地下創世紀 II：萬界迷宮）》的**繁體中文化專案**。
+《**Ultima Underworld: The Stygian Abyss**（地下創世紀：冥河深淵）》與《**Ultima Underworld II: Labyrinth of Worlds**（地下創世紀 II：次元之旅）》的**繁體中文化專案**。
 以原版 DOS 遊戲還原的原始碼為基礎，做成能直接在 Windows、macOS 上執行的原生版本，**不需要 DOSBox**。
 
 ![啟動頁：選擇要玩的遊戲](docs/release/zh-v1.0/launcher.png)

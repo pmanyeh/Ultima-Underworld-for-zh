@@ -25,6 +25,8 @@ int cSqRt(int32 v) { int r=0; while ((r+1)*(r+1)<=v) r++; return r; }
 #include "bright_grid_impl.h"
 static struct Object actor, held;
 struct Object *ThePlayer = &actor, *CursorObjPtr;
+static struct Player the_player;
+struct Player *player = &the_player;
 static struct Tile world[4096];
 struct Tile *mapdata = world;
 uint16 TxmTerr[TXM_FLOORS];
@@ -33,6 +35,7 @@ int16 PlayerLevel=1, GrSq, PlayerInput, NewPlayerX, NewPlayerY, NewPlayerLevel;
 char NewPlyFade;
 int16 nvokTerr, nvokHgt, GameInputMode, scrnum;
 char in_game=1;
+void far pretty_panelagain(void) {}
 void (*npp_func)(void);
 static uint32_t seed=123;
 uint32_t port_rand_seed(void) { return seed; }
@@ -65,7 +68,7 @@ static void (*live_fn[32])(int);
 void settings_enhancement(int b,int t,void (*fn)(int))
 {
     CHECK(fn && b>=0 && b<ENH_COUNT);
-    if(t==SET_TAB_CHEATS) CHECK(b==ENH_FULL_MAP || b==ENH_GOD_MODE || b==ENH_BRIGHT_VIEW || b==ENH_NO_WEAR);
+    if(t==SET_TAB_CHEATS) CHECK(b==ENH_FULL_MAP || b==ENH_GOD_MODE || b==ENH_BRIGHT_VIEW || b==ENH_NO_WEAR || b==ENH_ALL_RUNES || b==ENH_FREE_CAST);
     else { CHECK(t==SET_TAB_ENHANCE); live_rows|=1u<<b; live_fn[b]=fn; }
 }
 static int recorded;
@@ -101,7 +104,7 @@ int main(int argc,char **argv)
     if(argc>2) {
         cheat_init(&test_game);port_cheat_menu_init();
         CHECK(cheat_from_recording(argv[2]) == (!strcmp(argv[1],"public") ? 0 : -1));
-        if(!strcmp(argv[1],"public")) { port_cheat_point();CHECK(ENHANCED(ENH_GOD_MODE));port_cheat_point();CHECK(placements==1);port_cheat_point();CHECK(port_bright_strength()==15);
+        if(!strcmp(argv[1],"public")) { port_cheat_point();CHECK(ENHANCED(ENH_GOD_MODE));port_cheat_point();CHECK(placements==1);port_cheat_point();CHECK(ENHANCED(ENH_ALL_RUNES));port_cheat_point();CHECK(port_bright_strength()==15);
                                         port_cheat_point();CHECK(ENHANCED(ENH_SPLIT_ALL)); }
         else CHECK(!ENHANCED(ENH_GOD_MODE));
         printf("%s menu-only replay permission gate\n",failures?"FAIL":"PASS");return failures!=0;
@@ -239,10 +242,24 @@ int main(int argc,char **argv)
     CHECK(!cheat_menu_request("menu-no-wear 1"));scrnum=2;port_cheat_point();CHECK(!ENHANCED(ENH_NO_WEAR));
     scrnum=0;port_cheat_point();CHECK(ENHANCED(ENH_NO_WEAR) && !ENHANCED(ENH_GOD_MODE));
     CHECK(!cheat_menu_request("menu-no-wear 0"));port_cheat_point();CHECK(!ENHANCED(ENH_NO_WEAR));
+    /* Free casting: on and off at a safe point */
+    CHECK(!cheat_menu_request("menu-free-cast 1"));scrnum=2;port_cheat_point();CHECK(!ENHANCED(ENH_FREE_CAST));
+    scrnum=0;port_cheat_point();CHECK(ENHANCED(ENH_FREE_CAST));
+    CHECK(!cheat_menu_request("menu-free-cast 0"));port_cheat_point();CHECK(!ENHANCED(ENH_FREE_CAST));
+    /* All runestones: on and off at a safe point, and never written to the bag or the shelf */
+    {
+        static const unsigned char bag[3] = { 0x80, 0, 1 }, shelf[3] = { 1, 2, 0x18 };
+        memcpy(the_player.runebag, bag, 3);memcpy(the_player.shelf, shelf, 3);
+        CHECK(!cheat_menu_request("menu-runes 1"));scrnum=2;port_cheat_point();CHECK(!ENHANCED(ENH_ALL_RUNES));
+        scrnum=0;port_cheat_point();CHECK(ENHANCED(ENH_ALL_RUNES));
+        CHECK(!memcmp(the_player.runebag, bag, 3) && !memcmp(the_player.shelf, shelf, 3));
+        CHECK(!cheat_menu_request("menu-runes 0"));port_cheat_point();CHECK(!ENHANCED(ENH_ALL_RUNES));
+        CHECK(!memcmp(the_player.runebag, bag, 3) && !memcmp(the_player.shelf, shelf, 3));
+    }
     /* Enhancements the settings screen sets in play: each row its own flag, at a safe point, recorded */
     {
         static const int want[] = { ENH_INVERT_LOOK, ENH_FLASK_NUMBERS, ENH_AUTO_KEY, ENH_E_TAKES, ENH_DAMAGE_NUMBERS,
-                                    ENH_ENEMY_HEALTH, ENH_SPLIT_ALL, ENH_UNKNOWN_TOPIC, ENH_EASY_ERASE };
+                                    ENH_ENEMY_HEALTH, ENH_SPLIT_ALL, ENH_UNKNOWN_TOPIC, ENH_EASY_ERASE, ENH_SPELLBOOK, ENH_SPELLBOOK_ALL };
         uint32_t mask=0, before=enhance_on;
         int r, clears;
         char *bad[][2] = { {"god-mode","1"}, {"modern-keys","1"}, {"mouse-wheel","1"}, {"split-all","2"}, {"nonesuch","1"} };

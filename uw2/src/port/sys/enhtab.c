@@ -34,4 +34,8 @@ const struct enhance_flag enhance_table[ENH_COUNT] = {
     { "bright-view", "Gently brighten the current light source while keeping distance shading and exploration", ENH_PRESENTATION, NULL, NULL },
     { "damage-numbers", "Damage, misses and blocks float above visible enemies", ENH_PRESENTATION, NULL, NULL },
     { "enemy-health", "Health bars after creatures take damage or attack you; maximum is their highest observed health", ENH_PRESENTATION, NULL, NULL },
+    { "spellbook", "A book icon on the rune panel lists each circle's spells; a click puts a spell's runes on the shelf if you have them", ENH_GAMEPLAY, NULL, NULL },
+    { "spellbook-all", "The spell book also lists the spells the game's manual leaves out", ENH_GAMEPLAY, NULL, NULL },
+    { "all-runes", "Every rune counts as in the rune bag while this is on; the bag itself and saved games are left as they are", ENH_GAMEPLAY, NULL, NULL },
+    { "free-cast", "Any spell casts whatever your level, mana and skill, and wherever you are; it costs no mana and has no wait", ENH_GAMEPLAY, NULL, NULL },
 };

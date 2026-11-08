@@ -6,6 +6,7 @@
 #include "compat.h"
 #include "gfx.h"
 #include "ui.h"
+int port_has_rune(int rune);          /* ui/spellbook.c */
 #include "player.h"
 #include "combat.h"
 #include "sys.h"
@@ -244,7 +245,7 @@ void far port_key_rune(int ch)
         if (ch < 'a' || ch > 'y' || ch == 'x')
             return;
         rune = ch == 'y' ? 23 : ch - 'a';   /* no X rune: Y is Ylem, 23 */
-        if (!(player->runebag[rune >> 3] >> (7 - (rune & 7)) & 1)) {
+        if (!port_has_rune(rune)) {       /* spellbook.c: the bag, or all-runes */
             play_effect_here(45, 64, 0);    /* UltimaHacks' refusal: playSoundEffect(45, 64, 0) */
             return;
         }
