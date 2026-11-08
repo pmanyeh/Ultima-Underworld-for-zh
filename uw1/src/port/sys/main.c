@@ -306,7 +306,7 @@ static const char help_text[] =
     "\n"
     "Game and files:\n"
     "  --data DIR             the UW1 folder (UW.EXE, DATA, CRIT, CUTS, SOUND), or a folder\n"
-    "                         holding it or GOG's game.gog; found by itself when not given\n"
+    "                         holding it or its CD image (GOG game.gog, Steam game.bin); found by itself when not given\n"
     "                         ($UW1PORT_DATA, the last folder used, GOG's install folders)\n"
     "  --home DIR             where saved games and settings go ($UW1PORT_HOME, else ~/.uw1port)\n"
     "Enhancements (off by default; docs/ENHANCEMENTS.md):\n"

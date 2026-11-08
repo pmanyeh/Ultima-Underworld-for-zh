@@ -203,7 +203,7 @@ static const char help_text[] =
     "\n"
     "Game and files:\n"
     "  --data DIR             the UW2 folder (UW2.EXE, DATA, CRIT, CUTS, SOUND), or a folder\n"
-    "                         holding it or GOG's game.gog; found by itself when not given\n"
+    "                         holding it or its CD image (GOG game.gog, Steam game.bin); found by itself when not given\n"
     "                         ($UW2PORT_DATA, the last folder used, GOG's install folders)\n"
     "  --home DIR             where saved games and settings go ($UW2PORT_HOME, else ~/.uw2port)\n"
     "Language (Phase 14, in progress):\n"
@@ -451,6 +451,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "uw2port: cannot create the home directory %s (--home)\n", home);
         return 1;
     }
+    /* --data may name a folder holding the game or a CD image of it (GOG's game.gog, Steam's game.bin), as UW1's */
+    if (data && port_game_in(data, home, data_buf, sizeof data_buf) == 0) data = data_buf;
     if (find_game) {
         /* the launcher's question (launcher/): the game found without a window or a dialog,
            remembered as a player's run remembers it */

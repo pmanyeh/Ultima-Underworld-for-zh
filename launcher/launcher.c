@@ -8,7 +8,7 @@
 
    Where each game is comes from the games themselves: uw1port and uw2port --find-game search as
    they do on a player's start (sys/gamedir.c: the remembered folder, GOG's registry entries and
-   install folders, a GOG CD image), remember what they find in their home's settings file and
+   install folders, Steam's libraries, a GOG or Steam CD image), remember what they find in their home's settings file and
    exit 0. A game not found is started all the same, and asks for its folder in its own dialog.
    The search runs on a thread, so the page shows at once.
 
@@ -435,8 +435,8 @@ static void draw(void)
         text_centered(g->subtitle, x + CARD_W / 2.0f, CARD_Y + CARD_H + 56, 22, sel ? TEXT : GREY);
         if (state == FOUND) {
             char where[1100], *c;
-            if (strstr(g->data, "gog-cd"))     /* copied out of GOG's CD image into the home */
-                SDL_strlcpy(where, "已從 GOG 安裝取出", sizeof where);
+            if (strstr(g->data, "gog-cd"))     /* copied out of GOG's or Steam's CD image into the home */
+                SDL_strlcpy(where, "已從光碟映像取出（GOG／Steam）", sizeof where);
             else {
                 /* "/": the HD text reads a backslash as the start of a colour code */
                 SDL_strlcpy(where, g->data, sizeof where);
