@@ -1,4 +1,71 @@
-# 開發交接：UW1 繁中整合版／新對話入口（2026-10-31）
+# 開發交接：UW1＋UW2 繁中版／新對話入口（2026-11-08 更新）
+
+## 00. 目前狀態：zh-v1.1 已發布（2026-11-08）——新對話先看這節
+
+**一句話**：兩款都已中文化並合成一包，公開發布到 `zh-v1.1`（Latest）。目前沒有進行中的開發，等使用者或玩家回報。
+下面 §0 之後是按日期累積的詳細紀錄；凡寫「未提交」的 2026-11-06～08 條目，都已在下表的提交裡推送。
+
+### 00.1 Repo 與發布
+
+| 項目 | 現況 |
+| --- | --- |
+| 主 repo | `pmanyeh/Ultima-Underworld-for-zh`，本機分支 `feature/zh-tw-native` 追 `origin/main`，推送用 `git push origin HEAD:main` |
+| 子模組 exhume | `pmanyeh/Exhume-for-zh`（本機分支 `feature/presentation-overlay`，推送也用 `HEAD:main`） |
+| 提交身分 | `git -c user.name=pmanyeh -c user.email=pmanyeh@gmail.com commit …`，結尾加 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`；**只在使用者要求時提交／推送** |
+| 主 repo 最新 | `86bae82` docs: zh-v1.1 release pictures ← `80392b0` Steam ← `6e544af` 法術書等 ← `351ae96` 閃退與當機 |
+| exhume 最新 | `777b0e2` Steam 搜尋／跨磁碟 home ← `25cdf4c` 法術書與密技用詞 |
+| 發布 | **zh-v1.1**（tag 在 `86bae82`，Latest）https://github.com/pmanyeh/Ultima-Underworld-for-zh/releases/tag/zh-v1.1 ；前一版 zh-v1.0（tag 在 `094f204`） |
+| 成品（Git 外） | 工作區 `release-zh-v1.1/`：Windows ZIP `7f4971f9…`、macOS ZIP `e2025478…`（Mac CI run `42450555198`，手動觸發 `-f version=1.1`）、兩份法術表 PDF、`SHA256SUMS.txt`、`RELEASE_NOTES.md`（發布說明原稿） |
+| catalog | UW1 `8f48a314…`（與 1.0 相同）、UW2 `1d0ce3f8…`（含「跳躍術」） |
+| 發布說明截圖 | `docs/release/zh-v1.1/`（launcher.png、spellbook.png、cheats.png），合成工具 scratchpad `compose.py`（左 UW1、右 UW2，960×720 並排，標題用粉圓字型） |
+
+### 00.2 這一波（2026-11-06～08）做了什麼
+
+**新功能**（兩款都有）
+- **法術書**：強化功能 `spellbook`、`spellbook-all`（顯示手冊未列法術），預設關，F11 即時切換。
+  程式在 `uw1|uw2/src/port/ui/spellbook.c`，掛鉤在 `combat/RUNES.C`（`#ifndef __TURBOC__`）。
+  從符石袋面板左下的書本圖示開啟；開啟時遊戲暫停、走錄影輸入（可重播），游標強制為一般指標（`force_mouse_cursor`）。
+- **密技「獲得所有符石」**（`--enhance all-runes`、選單指令 `menu-runes 0|1`）：純開關，不寫 `runebag`、不進存檔。
+  判斷集中在 `port_has_rune()`，符文面板、點擊、rune-keys、法術書都用它。
+  注意：第一個測試版是直接寫滿 runebag 的，用那一版存過的檔無法靠開關恢復（只影響使用者自己的測試存檔）。
+- **密技「施法不受限」**（`--enhance free-cast`、`menu-free-cast 0|1`）：`player_cast` 跳過等級、法力、技能判定與 UW2 不列顛尼亞限制，不耗法力、無冷卻。
+- **支援 Steam 版**（EA 重新上架）：Steam 的 UW1、UW2 各有一份 `game.bin`（同一個 ISO，與 GOG 逐檔相同）。
+  exhume `gamedir.c` 接受 `.bin`、搜尋 Steam 遊戲庫（`gogreg.c` 的 `port_steam_root` 讀登錄檔，解析 `libraryfolders.vdf`）。
+  v1.0 玩家的替代辦法：把 game.bin 複製改名成 game.iso，再選那個資料夾。
+- UW2 產品標題改 **「地下創世紀 II：次元之旅」**；遊戲內對話仍稱「萬界迷宮」。UW2 法術「跳躍」改「跳躍術」。用詞統一為「符石袋」「符石欄」。
+
+**修正**
+- UW1／UW2「顯現術」、UW2「研究怪物」閃退：移植版把 (caster, target) 函式強轉成五參數 SpellFn，x64 上參數錯位。`SPELLS.C` 加 port-only 轉接函式。
+- UW2「環繞光球」推動地上物件後凍住或閃退：原版就有的兩個缺陷（被推的移動物件用錯格子 → `check_pplate` 無窮迴圈；`do_objhit` 後 `curP` 指到失效的框架）。
+  只在 port 端修（`uw2/src/motion/OBJPHYS.C`），紀錄在 `uw2/docs/FINDINGS.md`「Pushing a mobile object…」。
+- 程式在 D 槽、home 在 C 槽時誤報「不是資料夾」：`files.c` 的 mkdirs 跳過磁碟代號。
+
+**驗證**：units、UW1 16/16 重播、UW2 slice、錄製重播一致；使用者的 black box 錄影完整重播無錯；連施 80 次環繞光球通過。
+發布包：manifest 36/36 相符、不含遊戲檔、只用系統 DLL 可啟動、發布後下載五個檔案的 sha256 都相符。使用者已在 UW1、UW2 實測法術書與兩個密技 OK。
+
+### 00.3 尚未完成／待追蹤
+
+1. **Mac 1.1 未實機測試**（1.0 有）。使用者或范剛維有機會時再測。
+2. **GitHub CI `uw2-accuracy` 每次都失敗**：它是原作者的 DOS 準確度測試，需要原作者私人倉庫 `abedegno/uw2-ci-assets` 的金鑰，我們沒有，和程式無關。
+   使用者 2026-11-08 決定**先略過、不改**。若要處理：照 `uw1-accuracy.yml` 在各 job 加 `if: vars.UW2_CI_ASSETS == 'true'`，就會顯示「skipped」。
+3. **高階法術與手冊外法術未逐一實測效果**（現在可用兩個密技測）。「不列顛尼亞第 4 環以上必敗」也未實測。
+4. **「月門召喚術」看似卡住**：原版設計，要對月石施放；施放後是指定目標狀態，點非月石物件、背包空格或讀檔即可取消。未改原版行為，玩家若回報可說明。
+5. **法術書「點不到法術」**這個回報未能重現；加了游標修正後使用者實測 OK，再有回報時請要錄影。
+6. 舊 fork（remote `old-fork`）的 Issues 是否關閉，待使用者決定。
+7. `UW2` 構想清單第 1 項（開場語音）未授權。其他新功能未授權；之後依 Issues 修正。
+8. 本機試玩版（`UW1-zhTW-playtest`、`UW2-zhTW-playtest`）已換成這一波的 EXE，舊檔在各自 `backup/*.before-*-2026110x`。
+
+### 00.4 這一波的除錯方法（下次可沿用）
+
+- **玩家錄影**：遊戲資料夾 `home/recordings/<時間>/RECORD.OUT` 加 `stage/`。直接重播：
+  `uw2port.exe --data <遊戲資料> --home <stage 的複本> --hidden --exit-on-halt --replay RECORD.OUT`（`tools/replay.py` 的 `UW2_DIR` 在這台不好用）。
+  這一版的閃退與當機都是靠使用者錄影重現的。
+- 閃退位置：暫時在 crash.c 加 vectored exception handler 印位址，用 llvm-symbolizer／llvm-nm 對符號；當機：用 ctypes `GetThreadContext` 取樣卡住的執行緒。用完都已還原，沒有提交。
+- 注意：加了偵錯碼的版本可能因堆疊配置不同而「看似修好」（`curP` 那次就是），驗證一律用正式建置。
+- 重跑 UW1 重播前，先把 `uw1/build/i18n/uw2-shared/replays` 改名（上次改成 `replays-run16`）。
+- PATH 上的 python 沒有 PIL，截圖合成用 `C:\Users\pmany\AppData\Local\Programs\Python\Python312\python.exe`。
+- GOG／Steam 光碟映像已解出一份在 `home/gog-cd/UW1|UW2`。
+- 發布流程：`launcher/package.py`（Windows）→ Mac 由 `zh-release-macos.yml` 建置（版本號要手動觸發帶 `-f version=X`，push 觸發預設 1.0）→ `launcher/finish_release.py` 加 catalog 與字型 → scratchpad `verify11.py` 型的檢查（manifest、CRC、無遊戲檔、無開發路徑）→ 建 draft release（target 要用完整 SHA）→ 使用者同意後發布。
 
 ## 0. UW2 中文化：Phase 14 進行中（2026-10-31 使用者決定開工）
 
@@ -25,6 +92,68 @@ UW1 已告一段落（0.6、tag `zh-tw-native-p13`）。新 Session 直接開始
 - UW2：`uw2/src/port/presentation/localized.c` 接線（`--locale`、`--i18n-file`、`--hd-scroll`、`--font`；測試 `--scroll-log`、`--i18n-trace`、`--shot-on-text N`），
   掛鉤在 GAMESTRN／SCROLL／SCROLLIO／BABL／CONVERSE。對話已顯示中文；英文與「載入 catalog」模式 12 session 與 DOS golden 逐檢查點一致，HD 模式存檔相同。
 - 2026-11-01 依使用者回報改「罩住城堡的巨大寶石」7 列（見 `P14_SLICE.md`「譯文修正」，備份 `master.tsv.pre-gem-20261101`）。UW2 主表以 `l10n.py normalize` 補推導旗標 935 列（備份 `master.tsv.pre-normalize-20261031`）；catalog 9,543 筆，本機 `uw2/build/i18n/slice/catalog.uw2loc`（不提交）。
+- 2026-11-01 完成 UW2 全部譯文逐句審閱：改 540 列（備註欄「2026-11-01 審閱潤飾」，備份 `master.tsv.pre-review-20261101`），
+  紀錄在工作區 `i18n/uw2/zh-TW/review/`（`PROGRESS.md`、`edits/*.tsv`、`scripts/review_apply.py`）。`l10n.py validate` 0 問題，slice 四模式 PASS；
+  catalog 已複製到 `UW2-zhTW-playtest`。
+- 2026-11-01 使用者確認法術 Speed（Rel Tym Por）是「加速術」，舊中文手冊「降速」誤譯（UD-20261101-001，提交 `1fd3e05`）：
+  UW1 6:176／6:268 與權威詞表一起改，validate_authority、l10n authority／validate、64 個 l10n 單元測試、repocheck 通過；
+  UW2 主表 4 列同步。UW1 試玩版 catalog 換成 `uw1/build/i18n/speed/catalog.uw1loc`（`0e7a6974…`，舊檔備份同目錄
+  `previous-playtest-catalog.uw1loc`），UW2 試玩版 catalog `5261b226…`。UW1 portable／mac-kit 仍是更舊的 catalog，未動。
+- 2026-11-01 使用者回報 split-all：沒按確定就點別處仍只拿 1 個。原版左鍵結束輸入框固定當「1」；開啟 split-all 時改照輸入框數量
+  （提交 `9b45733`，UW1／UW2 `INVPANEL.C`）。`.poc-tools/split-click-check.py` 與 p13 live 通過、UW1 16 段四模式與 UW2 verify all／slice 一致。
+  兩個試玩版換新 exe（UW1 `00ab7183…`、UW2 `ff185138…`），舊檔在各自 `backup/*.before-split-click-20261101`，home 雜湊不變，說明.txt 已補。
+- 2026-11-01 使用者回報 UW2「You empty the chest.」沒翻：`USEITEMS.C` DumpTheBag 自己組句，照 UW1 改成 port_zh 組中文；
+  順便補 LOOK.C 的「Relk.」（瑞爾克的骨頭）。提交 `448d6b6`；UW2 verify all／slice PASS；試玩版 exe `d18be14e…`（舊檔
+  `backup/uw2port.exe.before-empty-chest-20261101`）。全面掃過 UW2 非 port 程式碼裡的寫死英文，其餘都已有中文處理（Error:、F1.99S 為除錯訊息）。
+- 2026-11-01 使用者回報地圖翻頁：UW1 開全地圖可翻到 Level 30（原版箭頭上限 99），UW2 不列顛尼亞第 6 層起空白（每個世界固定 8 格）。
+  提交 `1cf7594`：開 full-map 時 UW1 只到第 8 層（玩家在虛空時含 9）；UW2 依 DATA\LEV.ARK 只翻到存在的層、跳過缺號（虛空缺 70，71＝0x47 不顯示），
+  寶石切世界時深度超過就停在該世界最深層。關閉時照原版。截圖驗證：UW2 不列顛尼亞停 Level 5、UW1 停 Level 8 且整層顯示；
+  UW2 verify all／slice PASS，UW1 16 段四模式一致。試玩版 exe UW1 `28116ee8…`、UW2 `ac353dca…`（舊檔 `backup/*.before-map-levels-20261101`）。
+- 2026-11-01 公開發布準備：使用者決定做啟動頁、兩款合成一包、放標題圖。提交 `f276888`：`launcher/`（Underworld.exe：SDL3＋hd_font，
+  讀玩家遊戲檔的 OPSCR.BYT／BYT.ARK 第 5 張當標題圖；遊戲位置靠兩個 port 新增的 `--find-game`；找不到時照樣啟動，由遊戲自己的對話框選資料夾），
+  `launcher/package.py` 打包（一份 DLL／字型，UW1/、UW2/ 為各自 home，只放 i18n/zh-TW，不放 cfg → 強化功能全關）。
+  測試包在 scratchpad `pkg/Underworld-zhTW-test`：本機 GOG 經登錄檔找到 game.gog 並取出；--test-play 全流程 OK。
+  使用者同意 catalog 改存雜湊：exhume `f77aea3`＋主 repo `bb60541`，`l10n.py build` 預設 UW1LOC2（FNV-1a 64，無英文；`--with-english` 出舊格式），
+  runtime 兩種都讀；86 個 i18n 單元測試、UW2 verify／slice、UW1 16 段四模式（暫換成 v2 catalog）皆通過。UW2 catalog 1.08 MB→630 KB。
+  新測試包 scratchpad `pkg2/Underworld-zhTW-0.7.zip`（8.8 MB），exe 以外檔案搜不到遊戲英文。待做：Mac 版、CI、自動收集未翻英文、正式發布。
+- 2026-11-01 Release 1.0 準備（使用者決定：zh-v1.0 正式版、含 Mac、開 fork Issues——已開）。Mac：`.github/workflows/zh-release-macos.yml`
+  （push 到本分支動到 launcher/ 時建置；run `41311494330` 成功）→ `launcher/package_macos.py` 一個 Underworld.app 內含三程式＋`開始遊戲.command`
+  （--base 避開 App Translocation）；本機 `launcher/finish_release.py` 加 catalog 與字型（保留 CI 位元組與權限、修正 ditto 中文檔名）。
+  成品在工作區 `release-zh-v1.0/`（Windows `9f607058…`、macOS `08b0b32d…`、SHA256SUMS、RELEASE_NOTES.md）；
+  GitHub 已建 **草稿** release（target `2744484`，尚未建立 tag、未公開）。待：使用者 Mac 實機試玩、確認說明文字後才發布。
+- 2026-11-01 Release 說明改為圖文（使用者要求，UW1／UW2 並列）：圖在 `docs/release/zh-v1.0/`（提交 `54a91b3`；啟動頁、對話、遊戲畫面、全地圖、設定），
+  說明以該提交的 raw 網址引用；草稿 target 改為 `54a91b3`。截圖工具在 scratchpad（shot.py 重播截圖、shot2.py 輸入腳本截圖、compose.py 合成）。
+  UW2 城堡第 1 層地圖預設註記（A. MY QUARTERS … G. GREAT HALL）：已中文化（使用者決定；`e56a79c`），
+  繪製時查 phrases.c 的 `map_notes` 表，存檔仍保留原版英文。
+- 2026-11-01 **修正 UW2 中文地圖註記不顯示**（玩家可見 bug）：`MapNoteKey` 在含 compat.h `#pragma pack(1)` 的 bridge 與 map_notes.c
+  配置不同（x 位移 50 vs 52），註記存得進去但永遠找不到，只顯示「#001」。map_notes.h 加 `pack(push, 8)`（exhume 提交，主 repo `4742cd7`）。
+  輸入腳本新增 `T text 中文`（plat_text_typed）供測試中文輸入；shot2.py 須以 UTF-8 寫腳本（cp950 會讓中文變 Big5 而被拒）。
+  地圖圖片改為兩款都有中文註記；Release 說明加「按鍵說明」段（F11／Cmd+, →「按鍵說明」頁籤，隨現代按鍵變動）與致謝范剛維
+  （測試 Mac 版、提供 UW2 文本翻譯）。草稿 target `e56a79c`，資產已重建上傳（Windows `ecb45cb9…`、macOS `056abac7…`，Mac CI run `41318014861`）。
+- 2026-11-03 **Repo 搬到 `pmanyeh/Ultima-Underworld-for-zh`**（預設分支 main；本機分支 feature/zh-tw-native 追 origin/main，push 用 `git push origin HEAD:main`；
+  子模組 remote `pmanyeh/Exhume-for-zh`；舊 fork 留為 remote `old-fork`）。MSYS git 沒有身分，commit 加 `-c user.name=pmanyeh -c user.email=pmanyeh@gmail.com`。
+  啟動頁「回報問題」改指新 repo Issues、Mac workflow 改在 push main 時建置（`094f204`）。使用者 Mac 實機測試 OK。
+  **已正式發布 zh-v1.0**（tag 在 `094f204`，Latest）：https://github.com/pmanyeh/Ultima-Underworld-for-zh/releases/tag/zh-v1.0
+  （Windows `6494c3cc…`、macOS `6cd6972f…`，Mac CI run `41561173854`）。之後：等玩家回報 Issues。舊 fork 的 Issues 是否關閉待使用者決定。
+- 2026-11-06 法術表上傳到 `zh-v1.0`（使用者同意；不開新版，SHA256SUMS 未動）：`Underworld-zhTW-Spell-Chart-UW1-A4.pdf`（`d2d4107e…`）、`…-UW2-A4.pdf`（`6cffb869…`），Release 說明加「法術表」一節。
+  本機來源：工作區 `法術表-UW1-重繪版-A4橫式.pdf`、`法術表-UW2-重繪版-A4橫式.pdf`（符文自繪向量）；舊版 `法術表-中文-A4橫式.*`、`法術表-UW1-中文-A4橫式.*` 用來源不明的符文圖，勿對外發佈。對照表 `法術表-*中英對照.tsv`，UW2 手冊截圖在 `UW2_法術資料/`。
+  配方與環級和 `UW.EXE`、`UW2.EXE` 的法術表逐位元組相符。使用者 2026-11-06 確認 `UW2_法術資料/` 截圖就是手冊完整清單，所以 UW2 手冊列 49 個、未列 15 個（含勇氣、厚皮術、召喚惡魔、地震術、痛擊敵人）成立。「不列顛尼亞第 4 環以上必敗」與手冊外法術未逐一實測。
+  用詞已統一為權威檔的「符石欄」「符石袋」（程式、說明、法術表）；重繪法術表本機已重出，線上 `zh-v1.0` 的兩份 PDF 仍是舊字，隨下一版一起發佈（使用者決定）。提交先等使用者通知。
+- 2026-11-06 **法術書（尚未提交）**：強化功能 `spellbook`、`spellbook-all`，預設關，F11 即時切換。`uw1|uw2/src/port/ui/spellbook.c`（兩份僅開頭常數與符文名位置不同）、`combat/RUNES.C` 掛鉤（`#ifndef __TURBOC__`）。符文袋左下圖示開啟，模式迴圈在面板點擊內（遊戲暫停、走錄製輸入，可重播）。
+  驗證：UW1 16 段與 UW2 11 段重播一致、單元測試過（`test_cheat_menu` 已加兩個開關）、錄影重播存檔相同。DOS gate 未跑。測試開關 `UWnPORT_BOOK_RUNES=六位 hex`。工作樹含 exhume 的 settings_words.c 未提交。
+  試玩版已換 EXE（舊檔 `backup/*.before-spellbook-20261106.exe`）。發佈需出新版。
+- 2026-11-06 F11「密技」新增可開關的「獲得所有符石」（`--enhance all-runes`、`menu-runes 0|1`，UW1／UW2，未提交；使用者要求可開關）：不寫 `runebag`，由 `port_has_rune`（ui/spellbook.c）供符文面板、點擊、rune-keys、法術書判斷，關閉即恢復、不進存檔。按鈕的第一版會寫滿 runebag，用第一版存過的檔無法靠開關恢復。
+  另加可開關的「施法不受限」（`--enhance free-cast`、`menu-free-cast 0|1`）：`player_cast` 跳過等級、法力、技能判定與 UW2 不列顛尼亞限制，不耗法力、無冷卻，未提交。試玩版備份 `backup/*.before-free-cast-20261106`。
+  2026-11-08 修 UW2 推動物件的兩個原版缺陷（未提交，見 uw2/docs/FINDINGS.md「Pushing a mobile object…」）：使用者施放環繞光球後當機，由其 black box 錄影 `recordings/20261108-111647` 重現（`check_pplate` 無窮迴圈，修正後再現 `ObjectCheck` 讀到失效的 curP）。OBJPHYS.C 僅在 port 端改：被推的移動物件用自己的格子、`do_objhit` 後還原 curP。兩段錄影完整重播無錯；UW2 slice、錄製重播一致、連施 80 次環繞光球都通過。試玩版備份 `backup/uw2port.exe.before-push-fix-20261108`。
+  2026-11-08 **已正式發布 zh-v1.1**（使用者同意；tag `zh-v1.1` 在 `86bae82`，Latest）：https://github.com/pmanyeh/Ultima-Underworld-for-zh/releases/tag/zh-v1.1 ，發布後下載五個檔案 sha256 全部相符。原草稿資訊：target `86bae82`（含 docs/release/zh-v1.1 三張圖）。成品在 `release-zh-v1.1/`：Windows `7f4971f9…`（manifest source `80392b0`、exhume `777b0e2`，36/36 檔相符，系統 PATH 下兩款可啟動）、macOS `e2025478…`（手動觸發 CI run `42450555198` version 1.1，finish_release.py 加 catalog），法術表兩份 PDF、SHA256SUMS、RELEASE_NOTES.md。catalog：UW1 `8f48a314…`（同 1.0）、UW2 `1d0ce3f8…`（跳躍術）。Mac 版本次未實機測試。uw2-accuracy CI 因缺原作者私鑰一直失敗，與程式無關。發布前等使用者確認說明。
+  2026-11-08 Steam 版支援（已推送 `777b0e2`／`80392b0`）：EA 重新上架的 Steam 版 UW1、UW2 各有一份 `game.bin`（同一個 ISO，sha256 `846573e2…`，UW 297 檔／UW2 310 檔與 GOG 逐檔相同）。exhume gamedir.c 接受 `.bin` 映像並搜尋 Steam 遊戲庫（gogreg.c `port_steam_root` 讀登錄檔，解析 libraryfolders.vdf）；files.c mkdirs 跳過磁碟代號（程式在 D 槽、home 在 C 槽時原本誤報「不是資料夾」）；UW2 `--data` 可指向映像資料夾（同 UW1）；README／啟動頁文字改「GOG 或 Steam」。harness 驗證只靠 Steam 能找到；正式程式用 Steam 資料夾進到兩款中文標題。本機有 GOG 安裝，所以啟動器實際會先找到 GOG。v1.0 玩家的替代方法：把 game.bin 複製改名 game.iso 後選該資料夾。
+  2026-11-08 已提交並推送（使用者要求）：exhume `25cdf4c`、主 repo `351ae96`（兩個閃退與當機）＋`6e544af`（法術書、兩個符石密技、次元之旅、用詞）。以下各條的「未提交」皆已過時。CI 推送後開始跑（uw2-port、uw2-accuracy、zh-release-macos），repocheck 已過。
+  2026-11-08 修移植版轉譯錯誤（未提交）：法術表把 (caster, target) 的處理函式強轉成 SpellFn 五參數呼叫，x64 上 target 變成 y 座標而閃退——UW2「研究怪物」（使用者錄影 20261108-122752 重現）與 UW1／UW2「顯現術」（實測舊版必閃退）。SPELLS.C 加 port-only 轉接函式。units、UW1 16/16、UW2 slice 通過；試玩版備份 `backup/*.before-spellfn-20261108`。
+  月門召喚術要對月石施放：施放後是指定目標狀態，點非月石物件（顯示不是月石）、或背包空格、或讀檔即可取消；原版行為未改。
+  法術書開啟時游標強制為一般指標（修復仍顯示移動箭頭）。點不到法術的回報未能重現（同款 enhance 清單下 8 ms 以上的點擊都有效）；使用者已在 UW1、UW2 實測 OK（2026-11-06）。UW2 符石袋在第 1 層 (18,51) 的桌上，由 (19,49) 房間的北牆暗門 (19,50) 進入。試玩版 EXE 已更新（備份 `backup/*.before-allrunes-20261106`、`*.before-runes-toggle-20261106`）。
+- 2026-11-06 UW2 產品標題改「地下創世紀 II：次元之旅」（使用者同意）：launcher.c、launcher/README.zh-TW.txt、README.md（皆未提交）、GLOSSARY.md、release-zh-v1.0/RELEASE_NOTES.md、UW2 重繪法術表。對話 3629/244 的 labyrinth of worlds 與 proper-names 維持「萬界迷宮」。
+  使用者決定：新版 UW2 法術表 PDF **不替換 `zh-v1.0`，隨下一版中文化程式一起發佈**（本機來源 `法術表-UW2-重繪版-A4橫式.pdf`）。線上 `zh-v1.0` 的 PDF 與 Release 說明維持「萬界迷宮」，不要動；發佈下一版時，Release 說明的標題也一併用「次元之旅」。
+  UW2 6/270 改「跳躍術」（`review/edits/leap.tsv`，備份 `master.tsv.pre-leap-20261106`）；catalog `1d0ce3f8…` 已放 `uw2/build/i18n/slice`、`leap` 與試玩版（舊檔 `backup/catalog.uw2loc.before-leap-20261106`）。l10n validate 0 問題。
 - 本機工具：`.poc-tools/handoff/env-uw2.sh`（UW2 環境，含 `PKG_CONFIG_DONT_DEFINE_PREFIX=1`，否則 pkgconf 把 prefix 改成相對路徑而找不到 mt32emu）、
   `.poc-tools/uw2-slice-check.py`（UW2 四模式）、`.poc-tools/uw2-shared-check.py`（UW1 units／replays，比對搬移前）。
   UW2 字型放 `uw2/tools/fonts/`（已加入 .gitignore，從 UW1 複製）。無視窗截 HD 畫面：`SDL_VIDEODRIVER=offscreen` 不加 `--hidden`，配 `--shot-on-text N --screenshot A --window-shot B`。
@@ -108,6 +237,8 @@ catalog 與遊戲檔不上傳、玩家資料不覆寫、強化功能預設關）
 完整規劃見工作區主計畫 v2.5；其開頭仍是舊進度，當前狀態以本文件及有日期的最新報告為準。
 
 ## 2. Git 與交付現況
+
+> 下表是 2026-10-31（UW1 0.6）時的歷史狀態，repo 名稱與提交都已過時；**目前狀態以 §00 為準**。
 
 | 項目 | 現況 |
 | --- | --- |
@@ -325,6 +456,8 @@ export EXHUME_CONFIG="$UW1/exhume.toml"
 輸出到新的本機 build 目錄；不要改玩家資料夾。
 
 ## 8. 下一步與完成條件
+
+> 以下 1～6 是 UW1 0.6 時的清單；**目前的待追蹤事項見 §00.3**。
 
 1. 目前沒有待實測的功能：`unknown-topic`、E 撿起自動堆疊、地圖橡皮擦輔助、強化功能即時生效、標題頁游標延遲修正皆已於 2026-10-31 確認 OK。
    `split-all` 已於 2026-10-30 確認 OK。按鍵說明頁已於 2026-10-29 確認 OK。新按鍵已於 2026-10-27 確認 OK。
